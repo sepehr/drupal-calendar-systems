@@ -85,35 +85,34 @@ function _calendar_systems_load() {
 }
 
 /**
- *  Gets list of all supported calendar systems
+ * Internal helper which defines all available calendars manually.
+ *
+ * @return
+ *   An array defined calendars.
+ *
+ * @todo
+ *   Define a pluggable API, so other modules can hook the hell in.
  */
-function calendar_systems_get_all_plugins() {
-    $result=array(
-        'default' => array(
-            'title' => 'Drupal\'s Default',
-            'installed' => TRUE,
-            'installed version' => 2,
-        ),
-        /*
-        'gregorian' => array(
-            'title' => 'Gregorian',
-            'installed' => TRUE,
-            'installed version' => 2,
-        ),
-        */
-        'iranian' => array(
-            'title' => 'Iranian',
-            'installed' => TRUE,
-            'installed version' => 2,
-        ),
-        'arabic' => array(
-            'title' => 'Arabic',
-            'installed' => TRUE,
-            'installed version' => 2,
-        ),
-    );
+function _calendar_systems_plugins() {
+  $result = array(
+    'default' => array(
+      'title' => t('Default'),
+      'installed' => TRUE,
+      'installed version' => 2,
+    ),
+    'iranian' => array(
+      'title' => t('Iranian'),
+      'installed' => TRUE,
+      'installed version' => 2,
+    ),
+    'arabic'  => array(
+      'title' => t('Arabic'),
+      'installed' => TRUE,
+      'installed version' => 2,
+    ),
+  );
 
-    return $result;
+  return $result;
 }
 
 /**
