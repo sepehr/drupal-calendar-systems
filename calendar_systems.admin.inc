@@ -142,10 +142,11 @@ function calendar_systems_profile_delete_confirm($form, &$form_state, $profile) 
 
   // Build form array:
   $form = array();
-  $form['format'] = array(
+  $form['profile'] = array(
     '#type' => 'value',
-    '#value' => $language['name']
+    '#value' => $profile,
   );
+
   // Create the confirmation
   // form and let it be rendered:
   return confirm_form(
@@ -162,11 +163,11 @@ function calendar_systems_profile_delete_confirm($form, &$form_state, $profile) 
 function calendar_systems_profile_delete_confirm_submit($form, &$form_state) {
   // Delete the specified profile:
   db_delete('calendar_systems')
-    ->condition('language', $form_state['values']['format'])
+    ->condition('language', $form_state['values']['profile'])
     ->execute();
   // Notify user:
   drupal_set_message(t('Calendar systems profile for %name has been deleted.',
-    array('%name' => $form_state['values']['format'])
+    array('%name' => $form_state['values']['profile'])
   ));
   // Redirect user to the profile overview form:
   $form_state['redirect'] = 'admin/config/regional/calendar-systems';
