@@ -68,27 +68,6 @@ function calendar_systems_theme() {
 }
 
 /**
- * It loads modules required files
- *
- * @todo Rewrite.
- */
-function calendar_systems_load_dependenies() {
-  global $_calendar_systems_load_dependenies_called;
-
-  if ($_calendar_systems_load_dependenies_called !== TRUE) {
-    if (!class_exists('cmfcClassesCore') and !module_exists('cml')) {
-      require_once(dirname(__FIlE__) . '/calendar/lib/classesCore.class.inc.php');
-    }
-
-    if (!class_exists('cmfcCalendar')) {
-      require_once(dirname(__FIlE__) . '/calendar/calendar.class.inc.php');
-    }
-
-    $_calendar_systems_load_dependenies_called=TRUE;
-  }
-}
-
-/**
  *  Gets list of all supported calendar systems
  */
 function calendar_systems_get_all_plugins() {
