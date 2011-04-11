@@ -11,11 +11,23 @@ function calendar_systems_help($path, $arg) {
 }
 
 /**
+ * Implements hook_perm().
+ */
+function calendar_systems_perm() {
+  return array(
+    'administer calendar_systems',
+  );
+}
+
+/**
  * It loads modules required files
+ *
+ * @todo Rewrite.
  */
 function calendar_systems_load_dependenies() {
   global $_calendar_systems_load_dependenies_called;
-  if ($_calendar_systems_load_dependenies_called!==TRUE) {
+
+  if ($_calendar_systems_load_dependenies_called !== TRUE) {
     if (!class_exists('cmfcClassesCore') and !module_exists('cml')) {
       require_once(dirname(__FIlE__) . '/calendar/lib/classesCore.class.inc.php');
     }
@@ -26,17 +38,6 @@ function calendar_systems_load_dependenies() {
 
     $_calendar_systems_load_dependenies_called=TRUE;
   }
-}
-
-
-
-/**
- * Implements hook_perm().
- */
-function calendar_systems_perm() {
-  return array(
-    'administer calendar_systems',
-  );
 }
 
 /**
