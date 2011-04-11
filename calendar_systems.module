@@ -116,6 +116,34 @@ function _calendar_systems_plugins() {
 }
 
 /**
+ *  Internal helper to get all active languages.
+ *
+ * @return
+ *   An array of active languages.
+ */
+function _calendar_systems_langauges() {
+  // Default:
+  $languages['default'] = array(
+    'name' => 'Default'
+  );
+
+  // Check if there's any additional locale available:
+  $locales = function_exists('locale_language_list') ?
+    locale_language_list('name', TRUE) : NULL;
+
+  // If found, append 'em:
+  if (!is_null($locales)) {
+    foreach ($locales as $name => $title) {
+      $languages[$name] = array(
+        'name' => $title,
+      );
+    }
+  }
+
+  return $languages;
+}
+
+/**
  *  Gets list of active profiles
  */
 function calendar_systems_profile_load_all() {
