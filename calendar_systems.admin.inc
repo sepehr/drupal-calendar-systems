@@ -360,7 +360,7 @@ function calendar_systems_profile_overview($form, &$form_state) {
   $form = array();
 
   // Do not show the form in case that the patch is not yet applied.
-  if (!calendar_systems_does_patch_existance()) {
+  if (!_calendar_systems_patch_applied()) {
     // Build a form item, indicating the problem:
     $form['calendar_systems_error'] = array(
       '#type' => 'value',
