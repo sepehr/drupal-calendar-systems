@@ -534,10 +534,3 @@ function calendar_systems_profile_delete_confirm_submit($form, &$form_state) {
   ));
   //$form_state['redirect'] = 'admin/settings/calendar_systems';
 }
-
-/**
- * Remove a profile from the database.
- */
-function calendar_systems_profile_delete($format) {
-  db_query("DELETE FROM {calendar_systems} WHERE language = %d", $format);
-}
