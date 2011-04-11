@@ -144,6 +144,18 @@ function _calendar_systems_langauges() {
 }
 
 /**
+ * Internal helper to return site's current language.
+ *
+ * @return
+ *   Current language.
+ */
+function _calendar_systems_languages_active() {
+    global $language;
+    // Better?
+    return ($language && $language->language) ? $language->language : 'default';
+}
+
+/**
  * Internal static cache helper to get all available profiles.
  *
  * @return
