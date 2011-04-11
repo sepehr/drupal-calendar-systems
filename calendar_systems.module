@@ -29,7 +29,7 @@ function calendar_systems_menu() {
   $items = array();
 
   // Main configuration page:
-  $items['admin/config/calendar-systems'] = array(
+  $items['admin/config/regional/calendar-systems'] = array(
     'title' => 'Calendar systems',
     'description' => 'Administer calendar systems profiles.',
     'page callback' => 'drupal_get_form',
