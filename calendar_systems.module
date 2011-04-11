@@ -64,9 +64,6 @@ function calendar_systems_theme() {
     'calendar_systems_profile_overview' => array(
       'render element' => 'form',
     ),
-    'calendar_systems_admin_button_table' => array(
-      'render element' => 'form',
-    ),
   );
 }
 
