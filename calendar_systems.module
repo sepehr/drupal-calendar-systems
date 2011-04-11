@@ -161,7 +161,7 @@ function calendar_systems_profile_load_all() {
     if (!isset($profiles)) {
         $profiles = array();
         $result = db_query('SELECT language, calendar_system, settings FROM {calendar_systems}');
-        while ($profile = db_fetch_object($result)) {
+        foreach ($result as $profile) {
             $profile->settings = unserialize($profile->settings);
             $profiles[$profile->language] = $profile;
         }
