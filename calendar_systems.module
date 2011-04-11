@@ -95,7 +95,7 @@ function calendar_systems_theme() {
  *   A translated date string in the requested format.
  */
 function calendar_systems_format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
-  $calendar = calendar_systems_get_calendar_instance();
+  $calendar = _calendar_systems_factory();
 
   if (!isset($timezone)) {
     global $user;
