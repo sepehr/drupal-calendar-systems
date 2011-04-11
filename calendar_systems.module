@@ -129,13 +129,13 @@ function calendar_systems_format_date($timestamp, $type = 'medium', $format = ''
   for ($i = 0; $i < $max; $i++) {
     $c = $format[$i];
     if (strpos('AaDlM', $c) !== FALSE) {
-      $date .= $calendar->timestampToStr($c, $timestamp);
+      $date .= t($calendar->timestampToStr($c, $timestamp), array(), array('langcode' => $langcode));
     }
     elseif ($c == 'F') {
       // Special treatment for long month names: May is both an abbreviation
       // and a full month name in English, but other languages have
       // different abbreviations.
-      $date .= trim(t('!long-month-name '. $calendar->timestampToStr($c, $timestamp), array('!long-month-name' => ''), $langcode));
+      $date .= trim(t('!long-month-name ' . $calendar->timestampToStr($c, $timestamp), array('!long-month-name' => ''), array('langcode' => $langcode)));
     }
     elseif (strpos('BdgGhHiIjLmnsStTUwWYyz', $c) !== FALSE) {
       $date .= $calendar->timestampToStr($c, $timestamp);
