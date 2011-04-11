@@ -27,8 +27,7 @@ SUPPORT
 =======
 Found a bug? report here: http://drupal.org/node/add/project-issue/calendar_systems
 
-Author and Maintainers
-======================
+AUTHORS AND MAINTAINERS
+=======================
   Sina Salek - Original developer.
   Sepehr Lajevardi - D7 developer.
-
