@@ -161,6 +161,41 @@ function calendar_systems_format_date($timestamp, $type = 'medium', $format = ''
 }
 
 /**
+ * Implements hook_form_alter().
+ *
+ * @todo
+ *   Extend, fix.
+ */
+function calendar_systems_form_alter(&$form, $form_state, $form_id) {
+  // Overwrite date field element validate callback:
+  if (isset($form['author']['date'])) {
+    $form['author']['date']['#element_validate'] = array('calendar_systems_date_validate');
+  }
+  if (isset($form['admin']['date'])) {
+    $form['admin']['date']['#element_validate'] = array('calendar_systems_date_validate');
+  }
+}
+
+/**
+ * Element validation callback for date fields.
+ *
+ * @param $element
+ *   Form element.
+ * @param $form_state
+ *   Known form state array.
+ */
+function calendar_systems_date_validate($element, &$form_state) {
+  if (!empty($element['#value'])) {
+    $calendar = calendar_systems_get_calendar_instance();
+    $date = preg_replace('/([0-9]+\-[0-9]+\-[0-9]+) (.*)/si', '$1', $element['#value']);
+    $time = preg_replace('/([0-9]+\-[0-9]+\-[0-9]+) (.*)/si', '$2', $element['#value']);
+    $element['#value'] = $calendar->strToTimestamp("$date 10:10:10");
+    $element['#value'] = date("Y-m-d $time", $element['#value']);
+    form_set_value($element, $element['#value'], &$form_state);
+  }
+}
+
+/**
  * Internal helper to load calendar system's required dependencies.
  */
 function _calendar_systems_load() {
@@ -309,36 +344,4 @@ function calendar_systems_get_calendar_instance() {
   }
 
   return $calendar;
-}
-
-/**
- * Validates date fields considerign the acitve calendar system
- */
-function calendar_systems_date_validate($element, &$form_state) {
-   if (!empty($element['#value'])) {
-       // form_error($element, t('This field is required.'));
-       $v=$element['#value'];
-       $calendar=calendar_systems_get_calendar_instance();
-       $a=preg_replace('/([0-9]+\-[0-9]+\-[0-9]+) (.*)/si', '$1', $v);
-       $b=preg_replace('/([0-9]+\-[0-9]+\-[0-9]+) (.*)/si', '$2', $v);
-       $v=$calendar->strToTimestamp("$a 10:10:10");
-       $v=date("Y-m-d $b", $v);
-       form_set_value($element, $v, &$form_state);
-   }
-}
-
-/**
- * Implements hook_form_alter().
- * Optionally record all form submissions, for later use in
- * building distributions
- */
-function calendar_systems_form_alter(&$form, $form_state, $form_id) {
-
-    if (isset($form['author']['date'])) {
-        $form['author']['date']['#element_validate']=array('calendar_systems_date_validate');
-    }
-
-    if (isset($form['admin']['date'])) {
-        $form['admin']['date']['#element_validate']=array('calendar_systems_date_validate');
-    }
 }
