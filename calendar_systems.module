@@ -330,7 +330,7 @@ function _calendar_systems_factory() {
     $calendar_system = $profiles[$language]->calendar_system;
   }
   elseif (isset($profiles['default'])) {
-	$calendar_system = $profiles['default']->calendar_system;
+    $calendar_system = $profiles['default']->calendar_system;
   }
 
   if (empty($calendar_system))  {
