@@ -37,6 +37,6 @@ function calendar_systems_schema() {
  */
 function calendar_systems_enable() {
   drupal_set_message(t('Calendar systems has been successfully enabled. You might want to <a href="!link">configure its options</a>.',
-    array('!link' => url('admin/config/regional/calendar-systems')),
+    array('!link' => url('admin/config/regional/calendar-systems'))
   ));
 }
