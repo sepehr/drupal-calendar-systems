@@ -354,7 +354,7 @@ function theme_calendar_systems_admin_button_table(&$form) {
 
 /**
 * Check to see whether the require patch is applied or not
-* 
+*
 */
 function calendar_systems_does_patch_existance() {
     $fileContent=file_get_contents(realpath(drupal_get_path('module', 'system').'/../../includes/common.inc'));
@@ -367,49 +367,71 @@ function calendar_systems_does_patch_existance() {
 }
 
 /**
- * Display overview of setup Calendar systems Editor profiles; menu callback.
+ * Form callback for calendar systems profiles.
+ *
+ * @ingroup forms
  */
-function calendar_systems_profile_overview() {
+function calendar_systems_profile_overview($form, &$form_state) {
   $form = array();
-  
+
+  // Do not show the form in case that the patch is not yet applied.
   if (!calendar_systems_does_patch_existance()) {
-    $path=drupal_get_path('module', 'calendar_systems');
-    drupal_set_message("You haven't applied the required Drupal core's patch for this module to work, please follow the instructions in ".l('README.txt',$path.'/README.txt'),'error');
+    // Build a form item, indicating the problem:
+    $form['calendar_systems_error'] = array(
+      '#type' => 'value',
+      '#value' => t('You did not apply the required core patch for calendar systems to work, please follow the instructions in <a href="!readme-link">README.txt</a> file.', array(
+        '!readme-link' => url(drupal_get_path('module', 'calendar_systems') . '/README.txt'),
+      )),
+    );
+    // Render:
+    return $form;
   }
-  
-  $calendar_systems = calendar_systems_get_all_plugins();
-  $options = array();
-  foreach ($calendar_systems as $id=>$calendar_system) {
-      $options[$id]=$calendar_system['title'];
-  }
-  $languages = calendar_systems_get_all_langauges();
-  $profiles = calendar_systems_profile_load_all();
+
+  // The patch is properly applies,
+  // build the overview form array.
+  $form['formats'] = array();
   $form['formats']['#tree'] = TRUE;
+
+  // Set initials.
+  $options = array();
+  $profiles  = calendar_systems_profile_load_all();
+  $languages = calendar_systems_get_all_langauges();
+  $calendar_systems = calendar_systems_get_all_plugins();
+
+  // Build available calendar systems array:
+  foreach ($calendar_systems as $id => $calendar_system) {
+    $options[$id] = $calendar_system['title'];
+  }
+
+  // Table rows:
   foreach ($languages as $id => $language) {
+    // Language:
     $form['formats'][$id]['name'] = array(
       '#value' => check_plain($language['name']),
     );
+    // Calendar systems:
     $form['formats'][$id]['editor'] = array(
       '#type' => 'select',
-      '#default_value' => isset($profiles[$id]) ? $profiles[$id]->calendar_system : '',
       '#options' => $options,
       '#id' => "edit-editor-$id",
+      '#default_value' => isset($profiles[$id]) ? $profiles[$id]->calendar_system : '',
       '#disabled' => isset($profiles[$id]) ? (bool) $profiles[$id]->calendar_system : FALSE,
     );
+    // Operation links:
     if (isset($profiles[$id]) && !empty($profiles[$id]->calendar_system)) {
-      /*
-      $form['formats'][$id]['edit'] = array(
-        '#value' => l(t('Edit'), "admin/settings/calendar_systems/profile/$id/edit"),
-      );
-      */
       $form['formats'][$id]['remove'] = array(
         '#value' => l(t('Remove'), "admin/settings/calendar_systems/profile/$id/delete"),
       );
-      
     }
   }
 
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  // Append submit button:
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save')
+  );
+
+  // Render:
   return $form;
 }
 
