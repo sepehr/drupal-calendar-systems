@@ -436,25 +436,36 @@ function calendar_systems_profile_overview($form, &$form_state) {
 }
 
 /**
- * Return HTML for the Calendar systems profile overview form.
+ * Theme callback for calendar systems profiles form.
  */
 function theme_calendar_systems_profile_overview($form) {
+  // Check of unexpectency!
   if (!isset($form['formats'])) {
-    return;
+    return t('There were a problem getting calendar systems profiles.');
   }
-  $output = '';
-  $header = array(t('Language'), t('Calendar system'), array('data' => t('Operations'), 'colspan' => 2));
+
+  // Theme the form as a HTML table:
   $rows = array();
+  // Build rows array:
   foreach (element_children($form['formats']) as $item) {
     $format = &$form['formats'][$item];
     $rows[] = array(
       drupal_render($format['name']),
       drupal_render($format['editor']),
-      isset($format['edit']) ? drupal_render($format['edit']) : '',
       isset($format['remove']) ? drupal_render($format['remove']) : '',
     );
   }
-  $output .= theme('table', $header, $rows);
+  // And the header:
+  $header = array(
+    t('Language'),
+    t('Calendar system'),
+    array(
+      'colspan' => 2,
+      'data' => t('Operations'),
+    )
+  );
+  // Render and output:
+  $output = theme('table', array('header' => $header, 'rows' => $rows));
   $output .= drupal_render($form);
   return $output;
 }
