@@ -520,3 +520,16 @@ function calendar_systems_profile_delete_confirm_submit($form, &$form_state) {
   // Redirect user to the profile overview form:
   $form_state['redirect'] = 'admin/config/regional/calendar-systems';
 }
+
+/**
+ * Internal helper to check whether the required patch is currently applied.
+ *
+ * @return
+ *   Boolean value.
+ */
+function _calendar_systems_patch_applied() {
+  $content = file_get_contents(DRUPAL_ROOT . '/includes/common.inc');
+  // Check against patch fingerprint:
+  return (strpos($content,'foreach (module_implements(\'format_date\') AS $module) {') !== FALSE) ?
+    TRUE : FALSE;
+}
