@@ -33,9 +33,9 @@ function calendar_systems_profile_overview($form, &$form_state) {
 
   // Set initials.
   $options = array();
-  $profiles  = calendar_systems_profile_load_all();
-  $languages = calendar_systems_get_all_langauges();
-  $calendar_systems = calendar_systems_get_all_plugins();
+  $profiles  = _calendar_systems_profiles();
+  $languages = _calendar_systems_langauges();
+  $calendar_systems = _calendar_systems_plugins();
 
   // Build available calendar systems array:
   foreach ($calendar_systems as $id => $calendar_system) {
