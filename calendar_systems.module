@@ -38,13 +38,13 @@ function calendar_systems_menu() {
     'file' => 'calendar_systems.admin.inc',
   );
   // Configuration profile:
-  $items['admin/config/calendar-systems/profile'] = array(
+  $items['admin/config/regional/calendar-systems/profile'] = array(
     'title' => 'Calendar systems profiles',
     'description' => 'Assign calendar systems.',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   // Profile removal:
-  $items['admin/config/calendar-systems/profile/%/delete'] = array(
+  $items['admin/config/regional/calendar-systems/profile/%/delete'] = array(
     'title' => 'Remove',
     'description' => 'Assign calendar systems.',
     'page callback' => 'drupal_get_form',
