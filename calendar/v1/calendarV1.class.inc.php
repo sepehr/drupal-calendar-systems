@@ -2,7 +2,7 @@
 /**
 * @author Sina Salek
 * @changes
-* 	
+*
 * @todo
 * 	- finding and using persian calendar mktime function
 * 	- implementing arabic date
@@ -22,36 +22,36 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 	var $_language;
 	var $_timeZoneName;
 	var $_timeZoneInfo;
-	
+
 	var $_defaultError=CMF_CalendarV1_Error;
 	var $_messagesValue=array(
         CMF_CalendarV1_Ok	=> 'no error',
         CMF_CalendarV1_Error	=> 'unkown error',
         CMF_CalendarV1_Does_No_Exsists	=> 'template "%internalName%" does not exists',
 	);
-	
+
 	function __construct($options) {
 		$this->setOptions($options);
 	}
-	
+
 	function factory($options) {
 		if ($options['name']=='iranian') {
 			require_once(dirname(__FILE__).'/calendarSystems/iranian.class.inc.php');
 			return new cmfcCalendarV1Iranian($options);
 		}
-		
+
 		if ($options['name']=='gregorian') {
 			require_once(dirname(__FILE__).'/calendarSystems/gregorian.class.inc.php');
 			return new cmfcCalendarV1Gregorian($options);
 		}
-		
+
 		if ($options['name']=='arabic') {
 			require_once(dirname(__FILE__).'/calendarSystems/arabic.class.inc.php');
 			return new cmfcCalendarV1Arabic($options);
 		}
 	}
-	
-	
+
+
 	function setOption($name,$value,$merge=false) {
 		if ($name=='timeZoneOffset') {
 			$this->setTimeZoneOffset($value);
@@ -76,23 +76,23 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 		}
 		$this->_timeZoneInfo['offset']=$offset;
 	}
-	
+
 	function infoArrayToTimestamp() {
 	}
-	
+
 	function timestampToInfoArray() {
 	}
-	
+
 	function strToTimestamp($string) {
 	}
-	
+
     function gregorianStrToTimestamp($str) {
     	return strtotime($str);
 	}
-	
+
 	function timestampToStr($format,$timestamp) {
 	}
-	
+
 	/**
 	* For supporting timezone , use this class date and time functions like phpDate
 	*/
@@ -100,19 +100,19 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 		//$currentDate=$this->timestampToInfoArray();
 		$toTimestamp=$this->infoArrayToTimestamp($infoArray);
 		$fromTimestamp=$this->phpTime();
-				
+
 		$r=$this->dateTimeDiff($toTimestamp,$fromTimestamp);
 		$r['toTimestamp']=$toTimestamp;
 		$r['fromTimestamp']=$fromTimestamp;
 		return $r;
-	}	
-	
-	
+	}
+
+
 	function infoArrayToInfoArray($array) {
 		$ts=$this->infoArrayToTimestamp($array);
 		return $this->timestampToInfoArray($ts);
 	}
-	
+
 	function phpGetDate($timestamp=null) {
 		if (is_null($timestamp)) {
 			if (!empty($this->_timeZoneInfo)) {
@@ -130,7 +130,7 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 					'month'   => gmdate('M', $timestamp),
 					'0'       => $timestamp
 				);
-				
+
 			} else {
 				$timestamp=mktime();
 				$r=getdate($timestamp);
@@ -141,7 +141,7 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 		}
 		return $r;
 	}
-    
+
     function phpDate($format, $timestamp=null) {
 		if (is_null($timestamp) or empty($timestamp)) {
 			if (!empty($this->_timeZoneInfo)) {
@@ -156,7 +156,7 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 		}
 		return $r;
 	}
-	
+
 	function phpTime() {
 		if (!empty($this->_timeZoneInfo)) {
 			$timestamp=gmmktime()+$this->_timeZoneInfo['offset'];
@@ -165,24 +165,24 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 		}
 		return $timestamp;
 	}
-	
+
 	function getYmdwMonthAsNavigationalArray($options) {
-			
+
 		if (empty($options['columnsHorizontal'])) {
 			$options['columnsHorizontal']=6;
 		}
 		if (empty($options['columnsVertical'])) {
 			$options['columnsVertical']=5;
 		}
-		
+
 		if (isset($options['secondaryCalendar'])) {
 			$secondaryCalendar=self::factory(array(
 				'name'=>$options['secondaryCalendar']
 			));
 		}
-	    
+
 		$table=array();
-		
+
 		$currentMonth=$this->timestampToInfoArray();
 		if (is_null($options['year'])) {
 			$options['year']=$currentMonth['year'];
@@ -195,7 +195,7 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 		} else {
 			$selectedDay=$options['day'];
 		}
-		
+
 		$previousMonth=$this->infoArrayToInfoArray(array(
 			'year'=>$options['year'],
 			'month'=>$options['month']-1,
@@ -208,19 +208,19 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 			'day'=>$options['day'],
 		));
 
-		
+
 		$nextMonth=$this->infoArrayToInfoArray(array(
 			'year'=>$options['year'],
 			'month'=>$options['month']+1,
 			'day'=>$options['day'],
 		));
-	
-	    
+
+
 	    $table['currentMonth']=$currentMonth;
 	    $table['activeMonth']=$activeMonth;
 	    $table['nextMonth']=$nextMonth;
 	    $table['previousMonth']=$previousMonth;
-		
+
 		foreach ($this->_weeksName as $x=>$weekName) {
 		//for ($x=1;$x<=$options['columnsHorizontal'];$x++) {
 			$table['weekDays'][$x]=array(
@@ -249,13 +249,13 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 					if (in_array($x,$this->_weekDaysHoliday)) {
 						$value['status'][]='holiday';
 					}
-					
+
 					if (isset($secondaryCalendar)) {
 						$__activeMonth=$activeMonth;
 						$__activeMonth['day']=$dayNumber;
 						$value['secondaryCalendar']=$secondaryCalendar->timestampToInfoArray($this->infoArrayToTimestamp($__activeMonth));
 					}
-					
+
 					if ($y==5 and $x==6 and $activeMonth['monthDaysNumber']>($dayNumber)) {
 						$options['columnsVertical']++;
 					}
@@ -264,21 +264,21 @@ class cmfcCalendarV1 extends cmfcClassesCore{
 				$table['days'][$y][$x]=$value;
 			}
 		}
-		
+
 		return $table;
 	}
-	
+
     /**
     * Date    : 15-12-2003.
-    *    
+    *
     * Ref: Dates go in "2003-12-31".
     * Ref: Times go in "12:59:13".
     * Ref: mktime(HOUR,MIN,SEC,MONTH,DAY,YEAR).
-    *   
+    *
     * Splits the dates into parts, to be reformatted for mktime.
     * $first_datetime = getdate($first_datetime);
     * $second_datetime = getdate($second_datetime);
-    *    
+    *
     * makes the dates and times into unix timestamps.
     * $first_unix  = mktime($first_datetime['hours'], $first_time_ex[1], $first_time_ex[2], $first_date_ex[1], $first_date_ex[2], $first_date_ex[0]);
     * $second_unix  = mktime($second_time_ex[0], $second_time_ex[1], $second_time_ex[2], $second_date_ex[1], $second_date_ex[2], $second_date_ex[0]);
@@ -295,7 +295,7 @@ class cmfcCalendarV1 extends cmfcClassesCore{
         $mins=floor($remain/(60));
         $remain=$remain%(60);
         $secs=$remain;
-        
+
         // Returns a pre-formatted string. Can be chagned to an array.
         $result['daysTotal']=$daysTotal;
         //$result['days']=$days;
@@ -304,9 +304,9 @@ class cmfcCalendarV1 extends cmfcClassesCore{
         $result['seconds']=$secs;
         return $result;
     }
-    
-    
-    
+
+
+
     /**
     * convert seconds to days,hours,minuts,seconds as array
     * @param integer $seconds
@@ -328,3 +328,4 @@ class cmfcCalendarV1 extends cmfcClassesCore{
         return $r;
     }
 }
+
