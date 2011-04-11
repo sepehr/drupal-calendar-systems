@@ -66,10 +66,10 @@ function calendar_systems_menu() {
 function calendar_systems_theme() {
   return array(
     'calendar_systems_profile_overview' => array(
-      'arguments' => array('form' => NULL),
+      'render element' => 'form',
     ),
     'calendar_systems_admin_button_table' => array(
-      'arguments' => array('form' => NULL),
+      'render element' => 'form',
     ),
   );
 }
