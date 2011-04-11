@@ -33,13 +33,6 @@ function calendar_systems_schema() {
 }
 
 /**
- * Implements hook_install().
- */
-function calendar_systems_install() {
-  drupal_install_schema('calendar_systems');
-}
-
-/**
  * Implements hook_uninstall()
  */
 function calendar_systems_uninstall() {
