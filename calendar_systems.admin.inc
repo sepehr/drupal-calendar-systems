@@ -140,7 +140,7 @@ function calendar_systems_profile_overview_submit($form, &$form_state) {
  * @ingroup forms
  */
 function calendar_systems_profile_delete_confirm($form, &$form_state, $profile) {
-  $languages = calendar_systems_get_all_langauges();
+  $languages = _calendar_systems_langauges();
   $language = $languages[$profile];
 
   // Build form array:
