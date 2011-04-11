@@ -306,40 +306,45 @@ function _calendar_systems_profiles() {
 }
 
 /**
- *  Gets an instance of the calendar object for
- *  the selected calendar system acording to the settings
+ * A manual factory helper for user configured calendar.
  *
+ * @return
+ *   Calendar object or default on fail.
+ *
+ * @todo
+ *   Make it dynamic and customizable via parameters.
  */
-function calendar_systems_get_calendar_instance() {
-  calendar_systems_load_dependenies();
-  $profiles=calendar_systems_profile_load_all();
-  $lang=calendar_systems_get_active_lang();
+function _calendar_systems_factory() {
+  // Load module dependencies:
+  _calendar_systems_load();
+  // Load all available profiles:
+  $profiles = _calendar_systems_profiles();
+  // Get site's current language:
+  $language = calendar_systems_languages_active();
 
-  if (isset($profiles[$lang])) {
-    $calendar_system=$profiles[$lang]->calendar_system;
+  if (isset($profiles[$language])) {
+    $calendar_system = $profiles[$language]->calendar_system;
   }
-  else {
-    if ($profiles['default']) {
-		$calendar_system=$profiles['default']->calendar_system;
-	}
+  elseif ($profiles['default']) {
+	$calendar_system = $profiles['default']->calendar_system;
   }
+
   if (empty($calendar_system))  {
-    $calendar_system='default';
+    $calendar_system = 'default';
   }
-
-  if ($calendar_system=='iranian') {
-    $calendar=cmfcCalendar::factory('v1', array(
-      'name' => 'iranian'
+  if ($calendar_system == 'iranian') {
+    $calendar = cmfcCalendar::factory('v1', array(
+      'name' => 'iranian',
     ));
   }
-  elseif ($calendar_system=='arabic') {
-    $calendar=cmfcCalendar::factory('v1', array(
-      'name' => 'arabic'
+  elseif ($calendar_system == 'arabic') {
+    $calendar = cmfcCalendar::factory('v1', array(
+      'name' => 'arabic',
     ));
   }
-  elseif ($calendar_system=='default') {
-    $calendar=cmfcCalendar::factory('v1', array(
-      'name' => 'gregorian'
+  elseif ($calendar_system == 'default') {
+    $calendar = cmfcCalendar::factory('v1', array(
+      'name' => 'gregorian',
     ));
   }
 
