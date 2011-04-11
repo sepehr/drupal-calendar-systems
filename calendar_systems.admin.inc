@@ -182,6 +182,6 @@ function calendar_systems_profile_delete_confirm_submit($form, &$form_state) {
 function _calendar_systems_patch_applied() {
   $content = file_get_contents(DRUPAL_ROOT . '/includes/common.inc');
   // Check against patch fingerprint:
-  return (strpos($content,'foreach (module_implements(\'format_date\') AS $module) {') !== FALSE) ?
+  return (strpos($content, 'foreach (module_implements(\'format_date\') AS $module) {') !== FALSE) ?
     TRUE : FALSE;
 }
