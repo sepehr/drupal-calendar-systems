@@ -68,6 +68,23 @@ function calendar_systems_theme() {
 }
 
 /**
+ * Internal helper to load calendar system's required dependencies.
+ */
+function _calendar_systems_load() {
+  // This static variable will not need to be reset during
+  // the page request, so we're not using drupal_static() here.
+  static $loaded = FALSE;
+
+  if (!$loaded) {
+    if (!module_exists('cml')) {
+      module_load_include('class.inc.php', 'calendar_systems', 'calendar/lib/classesCore');
+    }
+    module_load_include('class.inc.php', 'calendar_systems', 'calendar/calendar');
+    $loaded = TRUE;
+  }
+}
+
+/**
  *  Gets list of all supported calendar systems
  */
 function calendar_systems_get_all_plugins() {
