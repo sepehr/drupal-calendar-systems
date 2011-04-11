@@ -144,24 +144,6 @@ function _calendar_systems_langauges() {
 }
 
 /**
- *  Gets list of active profiles
- */
-function calendar_systems_profile_load_all() {
-    static $profiles;
-
-    if (!isset($profiles)) {
-        $profiles = array();
-        $result = db_query('SELECT language, calendar_system, settings FROM {calendar_systems}');
-        foreach ($result as $profile) {
-            $profile->settings = unserialize($profile->settings);
-            $profiles[$profile->language] = $profile;
-        }
-    }
-
-    return $profiles;
-}
-
-/**
  * Gets name of the currently acitve language
  */
 function calendar_systems_get_active_lang() {
