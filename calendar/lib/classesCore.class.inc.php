@@ -9,7 +9,7 @@
 * 	- ability to enabled disabled passing events to observers and command handlers, via setOption('observingEnabled',false) and setOption('commandingEnabled',false)
 * @todo support PEAR::isError() method
 * @todo PEAR_ERROR_RETURN and other raiseError constants should become CMF_
-* 	
+*
 */
 
 
@@ -33,12 +33,12 @@ class cmfcClassesCore
 	 */
     var $_oLog = null;
 	var $_version='$Id: classesCore.class.inc.php,v 1.6 2010/06/08 05:42:44 sinasalek Exp $';
-    
-	/** 
+
+	/**
 	* @var cmfcStorage instance
 	*/
 	var $_oStorage=null;
-	
+
 	var $_observers=array();
 	var $_observeringEnabled=true;
 	var $_commandHandlers=array();
@@ -54,17 +54,17 @@ class cmfcClassesCore
 		CMF_ClassesCore_Error=>'unknown error'
 	);
 	var $_errorsStack=array();
-		
-	/**
-	* @desc 
-	*/
-	//var $_propertiesValues
-	
 
 	/**
-	 * there is no __construct function in php4 or down , so this function is solution , now it's possible 
+	* @desc
+	*/
+	//var $_propertiesValues
+
+
+	/**
+	 * there is no __construct function in php4 or down , so this function is solution , now it's possible
 	 * for all chid of this base class to have __construct functions
-	 * 
+	 *
 	 */
 	function cmfcClassesCore() {
 		//$this->PEAR(get_class($this));
@@ -76,9 +76,9 @@ class cmfcClassesCore
 	function getVersion() {
 		return $this->_version;
 	}
-	
 
-	
+
+
 	function setOptions($options,$merge=false) {
 		foreach ($options as $name=>$value) {
 			$r=$this->setOption($name,$value,$merge);
@@ -86,7 +86,7 @@ class cmfcClassesCore
 				return $r;
 		}
 	}
-	
+
 	function setOption($name,$value,$merge=false) {
 		if ($name=='storage') {
 			$r=&$this->setStorage($value);
@@ -98,29 +98,29 @@ class cmfcClassesCore
 			$this->{'_'.$name}=&$value;
 		}
 		$this->_options[$name]=&$value;
-		return $r;
+		return isset($r) ? $r : '';
 	}
-	
+
 	function setStorage(&$value) {
-		$this->_oStorage=&$value; 
+		$this->_oStorage=&$value;
 	}
-	
+
 	/**
 	* works fine in both php4 & 5. but you should use & when you call the function. $b=&$ins->getOption('property')
 	*/
 	function &getOption($name) {
 		return $this->{'_'.$name};
 	}
-	
+
 	function setLog(&$value) {
 		//if (!empty($this->_oLog))
 			//$this->_oLog=&Log::singleton('file', 'out.log', 'CreativeMindFramework');
 		$this->_oLog=&$value;
 	}
-	
-	
+
+
 	function getMessageValue($msgCode,$parameters=null) {
-		if (isset($this->_messagesValue[$msgCode]))	
+		if (isset($this->_messagesValue[$msgCode]))
 			$message=$this->_messagesValue[$msgCode];
 		else
 			$message=$this->_messagesValue[$this->_defaultError];
@@ -128,8 +128,8 @@ class cmfcClassesCore
 			$message=sprintf($message,$parameters);
 		return $message;
 	}
-	
-	
+
+
 	/**
 	*	fill all of object variables with their default values except $base_properties
 	*	$base_properties=array('local_language_name','db','event_system','configurations','table_name_prefix');
@@ -148,8 +148,8 @@ class cmfcClassesCore
 			}
 		}
 	}
-	
-	
+
+
 	function arrayToProperties($propertiesValues,$exceptNulls=false,$prefix=null) {
 		if (is_array($propertiesValues)) {
 			if ($this->_dynamicSystemEnabled) {
@@ -171,7 +171,7 @@ class cmfcClassesCore
 	function propertiesToArray($exceptNulls=false,$prefix=null) {
 		$propertiesValues=array();
 
-		if ($this->_dynamicSystemEnabled) {			
+		if ($this->_dynamicSystemEnabled) {
 			$vars=get_object_vars($this);
 			foreach ($vars as $varName=>$varValue) {
 				if (preg_match('/^'.$prefix.'.*/',$varName) or is_null($prefix))
@@ -190,7 +190,7 @@ class cmfcClassesCore
 
 	function clearProperties($prefix=null)
 	{
-		if ($this->_dynamicSystemEnabled) {	
+		if ($this->_dynamicSystemEnabled) {
 			$vars=get_object_vars($this);
 			foreach ($vars as $varName=>$varValue) {
 				if (preg_match('/^'.$prefix.'.*/',$varName) or is_null($prefix))
@@ -203,7 +203,7 @@ class cmfcClassesCore
 			*/
 		}
 	}
-	
+
 
     // }}}
     // {{{ raiseError()
@@ -213,7 +213,7 @@ class cmfcClassesCore
      * @example
      * <code>
      * 		return $this->raiseError('', CMF_Language_Error_Unknown_Short_Name,
-	 *						PEAR_ERROR_RETURN,NULL, 
+	 *						PEAR_ERROR_RETURN,NULL,
 	 *						array('shortName'=>$shortName)
 	 *		);
      * </code>
@@ -225,7 +225,7 @@ class cmfcClassesCore
                          $userinfo = null, $error_class = null, $skipmsg = false) {
 		if (isset($this->_messagesValue[$code]) && empty($message))
 			$message=$this->_messagesValue[$code];
-			
+
 		if (is_array($userinfo) && !empty($message)) {
 			if (is_array($userinfo))
 			foreach ($userinfo as $key=>$value) {
@@ -235,20 +235,20 @@ class cmfcClassesCore
 		}
 		return PEAR:: raiseError($message, $code, $mode, $options, $userinfo, $error_class, $skipmsg);
 	}
-	
-	
+
+
 	function isError($obj,$code=null) {
 		return false;
 		//return PEAR::isError($obj,$code);
 	}
-	
-	
+
+
     //! An accessor
     /**
     * Calls the update() function using the reference to each
     * registered observer - used by children of Observable
     * @return void
-    */ 
+    */
     function notifyObservers ($event,$params=null) {
     	if ($this->_observeringEnabled==true)
     	if (is_array($this->_observers[$event]))
@@ -256,27 +256,27 @@ class cmfcClassesCore
             call_user_func_array($observer,array(&$this,$params));
         }
     }
- 
+
     //! An accessor
     /**
     * Register the reference to an object object
     * @param $observer array|string //like call_user_func first param
     * @return void
-    */ 
+    */
     function addObserver($event, $observer,$parameters=null) {
        	$this->_observers[$event][]=$observer;
     }
-    
-    
+
+
     function prependObserver($event, $observer,$parameters=null) {
     	if (empty($this->_observers[$event])) $this->_observers[$event]=array();
     	array_unshift($this->_observers[$event],$observer);
     }
-    
+
     function removeObservers($cmd) {
        	$this->_commandHandlers[$cmd]=array();
     }
-	
+
 	/**
 	* @example
 	* <code>
@@ -293,14 +293,14 @@ class cmfcClassesCore
 			}
         }
     }
-    
+
     function hasCommandHandler($cmd) {
        	if (is_array($this->_commandHandlers[$cmd]))
        		if (!empty($this->_commandHandlers[$cmd]))
        			return true;
        	return false;
     }
- 
+
  	/**
  	* @example
  	* <code>
@@ -311,27 +311,27 @@ class cmfcClassesCore
     function addCommandHandler ($cmd, $commandHandler,$parameters=null) {
        	$this->_commandHandlers[$cmd][]=$commandHandler;
     }
-    
-    
+
+
     function removeCommandHandlers ($cmd) {
        	$this->_commandHandlers[$cmd]=array();
     }
-    
+
     function prependCommandHandler ($cmd, $commandHandler,$parameters=null) {
     	if (empty($this->_commandHandlers[$cmd])) $this->_commandHandlers[$cmd]=array();
     	array_unshift($this->_commandHandlers[$cmd],$commandHandler);
     }
-    
+
     /**
     * memento design pattern
     * will clone the object for adding undo ability.
     * @todo
-    * 	- should become complete 
+    * 	- should become complete
     */
     function saveToMemento() {
     	return clone($this);
 	}
-	
+
     /**
     * memento design pattern
     * will load the object previous state
