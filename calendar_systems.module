@@ -306,7 +306,7 @@ function _calendar_systems_profiles() {
     }
   }
 
-  return $profiles;
+  return $cache;
 }
 
 /**
