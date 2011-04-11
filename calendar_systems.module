@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function calendar_systems_help($path, $arg) {
   switch ($path) {
@@ -12,8 +13,8 @@ function calendar_systems_help($path, $arg) {
 
 
 /**
-* It loads modules required files
-*/
+ * It loads modules required files
+ */
 function calendar_systems_load_dependenies() {
   global $_calendar_systems_load_dependenies_called;
   if ($_calendar_systems_load_dependenies_called!==TRUE) {
@@ -24,7 +25,7 @@ function calendar_systems_load_dependenies() {
     if (!class_exists('cmfcCalendar')) {
       require_once(dirname(__FIlE__) . '/calendar/calendar.class.inc.php');
     }
-    
+
     $_calendar_systems_load_dependenies_called=TRUE;
   }
 }
@@ -32,7 +33,7 @@ function calendar_systems_load_dependenies() {
 
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  */
 function calendar_systems_perm() {
   return array(
@@ -41,7 +42,7 @@ function calendar_systems_perm() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function calendar_systems_menu() {
   $items['admin/settings/calendar_systems'] = array(
@@ -80,12 +81,12 @@ function calendar_systems_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
-  return $items; 
+  return $items;
 }
 
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  *
  * @see drupal_common_theme(), common.inc
  * @see template_preprocess_page(), theme.inc
@@ -98,8 +99,8 @@ function calendar_systems_theme() {
 }
 
 /**
-*  Gets list of all supported calendar systems
-*/
+ *  Gets list of all supported calendar systems
+ */
 function calendar_systems_get_all_plugins() {
     $result=array(
         'default' => array(
@@ -125,21 +126,21 @@ function calendar_systems_get_all_plugins() {
             'installed version' => 2,
         ),
     );
-    
+
     return $result;
 }
 
 /**
-*  Gets list of active langauges
-*/
+ *  Gets list of active langauges
+ */
 function calendar_systems_get_all_langauges() {
-    
+
     if (function_exists('locale_language_list')) {
         $langs=locale_language_list('name', TRUE);
     } else {
         $langs=array();
     }
-    
+
     $result['default']=array(
         'name' => 'Default'
     );
@@ -150,13 +151,13 @@ function calendar_systems_get_all_langauges() {
             );
         }
     }
-    
+
     return $result;
 }
 
 /**
-*  Gets list of active profiles 
-*/
+ *  Gets list of active profiles
+ */
 function calendar_systems_profile_load_all() {
     static $profiles;
 
@@ -173,8 +174,8 @@ function calendar_systems_profile_load_all() {
 }
 
 /**
-* Gets name of the currently acitve language
-*/
+ * Gets name of the currently acitve language
+ */
 function calendar_systems_get_active_lang() {
     global $language;
     $result='default';
@@ -183,15 +184,15 @@ function calendar_systems_get_active_lang() {
             $result=$language->language;
         }
     }
-    
+
     return $result;
 }
 
 /**
-*  Gets an instance of the calendar object for
-*  the selected calendar system acording to the settings
-*  
-*/
+ *  Gets an instance of the calendar object for
+ *  the selected calendar system acording to the settings
+ *
+ */
 function calendar_systems_get_calendar_instance() {
   calendar_systems_load_dependenies();
   $profiles=calendar_systems_profile_load_all();
@@ -199,7 +200,7 @@ function calendar_systems_get_calendar_instance() {
 
   if (isset($profiles[$lang])) {
     $calendar_system=$profiles[$lang]->calendar_system;
-  } 
+  }
   else {
     if ($profiles['default']) {
 		$calendar_system=$profiles['default']->calendar_system;
@@ -213,12 +214,12 @@ function calendar_systems_get_calendar_instance() {
     $calendar=cmfcCalendar::factory('v1', array(
       'name' => 'iranian'
     ));
-  } 
+  }
   elseif ($calendar_system=='arabic') {
     $calendar=cmfcCalendar::factory('v1', array(
       'name' => 'arabic'
     ));
-  } 
+  }
   elseif ($calendar_system=='default') {
     $calendar=cmfcCalendar::factory('v1', array(
       'name' => 'gregorian'
@@ -231,7 +232,7 @@ function calendar_systems_get_calendar_instance() {
 
 
 /**
- * Implementation of hook format_date
+ * Implements hook format_date
  *
  * Format a date with the given configured format or a custom format string.
  *
@@ -258,7 +259,7 @@ function calendar_systems_get_calendar_instance() {
  */
 function calendar_systems_format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
   $calendar=calendar_systems_get_calendar_instance();
-  
+
   if (!isset($timezone)) {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
@@ -323,8 +324,8 @@ function calendar_systems_format_date($timestamp, $type = 'medium', $format = ''
 }
 
 /**
-* Validates date fields considerign the acitve calendar system
-*/
+ * Validates date fields considerign the acitve calendar system
+ */
 function calendar_systems_date_validate($element, &$form_state) {
    if (!empty($element['#value'])) {
        // form_error($element, t('This field is required.'));
@@ -339,16 +340,16 @@ function calendar_systems_date_validate($element, &$form_state) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  * Optionally record all form submissions, for later use in
  * building distributions
  */
 function calendar_systems_form_alter(&$form, $form_state, $form_id) {
-     
+
     if (isset($form['author']['date'])) {
         $form['author']['date']['#element_validate']=array('calendar_systems_date_validate');
     }
-    
+
     if (isset($form['admin']['date'])) {
         $form['admin']['date']['#element_validate']=array('calendar_systems_date_validate');
     }
