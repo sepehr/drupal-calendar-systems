@@ -6,39 +6,6 @@
  */
 
 /**
- * Submit callback for Calendar systems profile form.
- *
- * @see calendar_systems_profile_form()
- */
-function calendar_systems_profile_form_submit($form, &$form_state) {exit;
-  $values = $form_state['values'];
-  if (isset($values['buttons'])) {
-    // Store only enabled buttons for each plugin.
-    foreach ($values['buttons'] as $plugin => $buttons) {
-      $values['buttons'][$plugin] = array_filter($values['buttons'][$plugin]);
-    }
-    // Store only enabled plugins.
-    $values['buttons'] = array_filter($values['buttons']);
-  }
-  // Remove input format name.
-  $format = $values['format'];
-  $input_format = $values['input_format'];
-  $editor = $values['editor'];
-  unset($values['format'], $values['input_format'], $values['editor']);
-
-  // Remove FAPI values.
-  // @see system_settings_form_submit()
-  unset($values['submit'], $values['form_id'], $values['op'], $values['form_token']);
-
-  // Insert new profile data.
-  db_query("UPDATE {calendar_systems} SET settings = '%s' WHERE language = %d", serialize($values), $format);
-
-  drupal_set_message(t('Calendar systems profile for %format has been saved.', array('%format' => $input_format)));
-
-  $form_state['redirect'] = 'admin/settings/calendar_systems';
-}
-
-/**
  * Layout for the buttons in the Calendar systems Editor profile form.
  */
 function theme_calendar_systems_admin_button_table(&$form) {
