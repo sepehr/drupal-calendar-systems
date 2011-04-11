@@ -26,42 +26,37 @@ function calendar_systems_permission() {
  * Implements hook_menu().
  */
 function calendar_systems_menu() {
-  $items['admin/settings/calendar_systems'] = array(
+  $items = array();
+
+  // Main configuration page:
+  $items['admin/config/calendar-systems'] = array(
     'title' => 'Calendar systems',
+    'description' => 'Administer calendar systems profiles.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('calendar_systems_profile_overview'),
-    'description' => 'Assign calendar systems.',
     'access arguments' => array('administer calendar_systems'),
     'file' => 'calendar_systems.admin.inc',
   );
-  $items['admin/settings/calendar_systems/profile'] = array(
-    'title' => 'Profiles',
+  // Configuration profile:
+  $items['admin/config/calendar-systems/profile'] = array(
+    'title' => 'Calendar systems profiles',
     'description' => 'Assign calendar systems.',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/settings/calendar_systems/profile/%/edit'] = array(
-    'title' => 'Edit',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('calendar_systems_profile_form', 4),
-    'access arguments' => array('administer calendar_systems'),
-    'file' => 'calendar_systems.admin.inc',
-    'description' => 'Assign calendar systems.',
-    'tab_root' => 'admin/settings/calendar_systems/profile',
-    'tab_parent' => 'admin/settings/calendar_systems/profile/%',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/settings/calendar_systems/profile/%/delete'] = array(
+  // Profile removal:
+  $items['admin/config/calendar-systems/profile/%/delete'] = array(
     'title' => 'Remove',
+    'description' => 'Assign calendar systems.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('calendar_systems_profile_delete_confirm', 4),
     'access arguments' => array('administer calendar_systems'),
-    'description' => 'Assign calendar systems.',
-    'file' => 'calendar_systems.admin.inc',
     'tab_root' => 'admin/settings/calendar_systems/profile',
     'tab_parent' => 'admin/settings/calendar_systems/profile/%calendar_systems_profile',
+    'file' => 'calendar_systems.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
+
   return $items;
 }
 
