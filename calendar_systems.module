@@ -195,7 +195,7 @@ function calendar_systems_date_validate($element, &$form_state) {
     $element['#value'] = $calendar->strToTimestamp("$date 10:10:10");
     $element['#value'] = date("Y-m-d $time", $element['#value']);
     // And set the form value:
-    form_set_value($element, $element['#value'], &$form_state);
+    form_set_value($element, $element['#value'], $form_state);
   }
 }
 
