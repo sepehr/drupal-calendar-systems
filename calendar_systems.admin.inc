@@ -351,21 +351,6 @@ function theme_calendar_systems_admin_button_table(&$form) {
   return $output;
 }
 
-
-/**
-* Check to see whether the require patch is applied or not
-*
-*/
-function calendar_systems_does_patch_existance() {
-    $fileContent=file_get_contents(realpath(drupal_get_path('module', 'system').'/../../includes/common.inc'));
-    if (strpos($fileContent,'foreach (module_implements(\'format_date\') AS $module) {')!==false) {
-        $fileContent=null;
-        return true;
-    }
-    $fileContent=null;
-    return false;
-}
-
 /**
  * Form callback for calendar systems profiles.
  *
