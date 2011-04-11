@@ -6,39 +6,6 @@
  */
 
 /**
- * Layout for the buttons in the Calendar systems Editor profile form.
- */
-function theme_calendar_systems_admin_button_table(&$form) {
-  $buttons = array();
-
-  // Flatten forms array.
-  foreach (element_children($form) as $name) {
-    foreach (element_children($form[$name]) as $button) {
-      $buttons[] = drupal_render($form[$name][$button]);
-    }
-  }
-
-  // Split checkboxes into rows with 3 columns.
-  $total = count($buttons);
-  $rows = array();
-  for ($i = 0; $i < $total; $i++) {
-    $row = array();
-    $row[] = array('data' => $buttons[$i]);
-    if (isset($buttons[++$i])) {
-      $row[] = array('data' => $buttons[$i]);
-    }
-    if (isset($buttons[++$i])) {
-      $row[] = array('data' => $buttons[$i]);
-    }
-    $rows[] = $row;
-  }
-
-  $output = theme('table', array(), $rows, array('width' => '100%'));
-
-  return $output;
-}
-
-/**
  * Form callback for calendar systems profiles.
  *
  * @ingroup forms
