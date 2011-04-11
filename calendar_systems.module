@@ -166,21 +166,6 @@ function _calendar_systems_profiles() {
 }
 
 /**
- * Gets name of the currently acitve language
- */
-function calendar_systems_get_active_lang() {
-    global $language;
-    $result='default';
-    if ($language) {
-        if ($language->language) {
-            $result=$language->language;
-        }
-    }
-
-    return $result;
-}
-
-/**
  *  Gets an instance of the calendar object for
  *  the selected calendar system acording to the settings
  *
