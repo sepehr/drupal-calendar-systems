@@ -407,7 +407,8 @@ function calendar_systems_profile_overview($form, &$form_state) {
   foreach ($languages as $id => $language) {
     // Language:
     $form['formats'][$id]['name'] = array(
-      '#value' => check_plain($language['name']),
+      '#type' => 'markup',
+      '#markup' => check_plain($language['name']),
     );
     // Calendar systems:
     $form['formats'][$id]['editor'] = array(
@@ -420,11 +421,11 @@ function calendar_systems_profile_overview($form, &$form_state) {
     // Operation links:
     if (isset($profiles[$id]) && !empty($profiles[$id]->calendar_system)) {
       $form['formats'][$id]['remove'] = array(
-        '#value' => l(t('Remove'), "admin/settings/calendar_systems/profile/$id/delete"),
+        '#type' => 'markup',
+        '#markup' => l(t('Remove'), "admin/config/regional/calendar-systems/profile/$id/delete"),
       );
     }
   }
-
   // Append submit button:
   $form['submit'] = array(
     '#type' => 'submit',
@@ -438,17 +439,17 @@ function calendar_systems_profile_overview($form, &$form_state) {
 /**
  * Theme callback for calendar systems profiles form.
  */
-function theme_calendar_systems_profile_overview($form) {
+function theme_calendar_systems_profile_overview($variables) {//dpm($variables['form']);dpm(element_children($variables['form']['formats']));return;
   // Check of unexpectency!
-  if (!isset($form['formats'])) {
+  if (!isset($variables['form']['formats'])) {
     return t('There were a problem getting calendar systems profiles.');
   }
 
   // Theme the form as a HTML table:
   $rows = array();
   // Build rows array:
-  foreach (element_children($form['formats']) as $item) {
-    $format = &$form['formats'][$item];
+  foreach (element_children($variables['form']['formats']) as $item) {
+    $format = &$variables['form']['formats'][$item];
     $rows[] = array(
       drupal_render($format['name']),
       drupal_render($format['editor']),
@@ -464,9 +465,10 @@ function theme_calendar_systems_profile_overview($form) {
       'data' => t('Operations'),
     )
   );
-  // Render and output:
+  // Theme the table:
   $output = theme('table', array('header' => $header, 'rows' => $rows));
-  $output .= drupal_render($form);
+  // Render the actual form & append:
+  $output .= drupal_render_children($variables['form']);
   return $output;
 }
 
@@ -476,12 +478,20 @@ function theme_calendar_systems_profile_overview($form) {
 function calendar_systems_profile_overview_submit($form, &$form_state) {
   foreach ($form_state['values']['formats'] as $format => $values) {
     if ($values['editor'] != 'default') {
-      db_query("UPDATE {calendar_systems} SET calendar_system = '%s' WHERE language = '%s'", $values['editor'], $format);
-      if (!db_affected_rows()) {
-        db_query("INSERT INTO {calendar_systems} (language, calendar_system) VALUES ('%s', '%s')", $format, $values['editor']);
-      }
+      // Build the record object:
+      $record = new stdClass();
+      $record->language = $format;
+      $record->calendar_system = $values['editor'];
+      // Try to update existing profile:
+      drupal_write_record('calendar_systems', $record);
+      //if (drupal_write_record('calendar_systems', $record, 'language') != SAVED_UPDATED) {
+      //  // Insert otherwise:
+      //  drupal_write_record('calendar_systems', $record);
+      //}
     }
   }
+  // Notify user:
+  drupal_set_message(t('Calendar systems profile configuration has been saved.'));
 }
 
 /**
