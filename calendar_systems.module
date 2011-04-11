@@ -329,7 +329,7 @@ function _calendar_systems_factory() {
   if (isset($profiles[$language])) {
     $calendar_system = $profiles[$language]->calendar_system;
   }
-  elseif ($profiles['default']) {
+  elseif (isset($profiles['default'])) {
 	$calendar_system = $profiles['default']->calendar_system;
   }
 
