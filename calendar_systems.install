@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * Implementation of hook_schema().
+ */
+function calendar_systems_schema() {
+  $schema = array();
+  $schema['calendar_systems'] = array(
+    'description' => t('Stores calendar_systems profiles.'),
+    'fields' => array(
+      'language' => array('type' => 'varchar','length' => 128, 'not null' => TRUE, 'default' => ''),
+      'calendar_system' => array('type' => 'varchar', 'length' => 128, 'not null' => TRUE, 'default' => ''),
+      'settings' => array('type' => 'text', 'size' => 'normal'),
+    ),
+    'primary key' => array('language'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function calendar_systems_install() {
+  drupal_install_schema('calendar_systems');
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function calendar_systems_uninstall() {
+  drupal_uninstall_schema('calendar_systems');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function calendar_systems_enable() {
+  // Disable conflicting, obsolete editor integration modules whenever this
+  // module is enabled. This is crude, but the only way to ensure no conflicts.
+  /*
+  module_disable(array(
+    'editarea',
+    'editonpro',
+    'editor',
+    'fckeditor',
+    'freerte',
+    'htmlarea',
+    'htmlbox',
+    'jcalendar_systems',
+    'markitup',
+    'nicedit',
+    'opencalendar_systems',
+    'pegoeditor',
+    'quicktext',
+    'tinymce',
+    'tinymce_autoconf',
+    'tinytinymce',
+    'whizzywig',
+    'widgeditor',
+    'wymeditor',
+    'xstandard',
+    'yui_editor',
+  ));
+  */
+}
+
+/**
+ * Retrieve a list of input formats to associate profiles to.
+ */
+ /*
+function _calendar_systems_install_get_formats() {
+  $formats = array();
+  $result = db_query("SELECT format, name FROM {filter_formats}");
+  while ($format = db_fetch_object($result)) {
+    // Build a list of all formats.
+    $formats[$format->format] = $format->name;
+    // Fetch filters.
+    $result2 = db_query("SELECT module, delta FROM {filters} WHERE format = %d", $format->format);
+    while ($filter = db_fetch_object($result2)) {
+      // If PHP filter is enabled, remove this format.
+      if ($filter->module == 'php') {
+        unset($formats[$format->format]);
+        break;
+      }
+    }
+  }
+  return $formats;
+}
+*/

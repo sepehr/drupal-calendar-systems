@@ -1,0 +1,23 @@
+Index: includes/common.inc
+===================================================================
+--- includes/common.inc	(revision 266)
++++ includes/common.inc	(working copy)
+@@ -1300,6 +1300,18 @@
+  *   A translated date string in the requested format.
+  */
+ function format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
++  // Custom hook
++  foreach (module_implements('format_date') AS $module) {
++    if ($module!='date') {
++        $function = $module .'_format_date';
++        $r=$function($timestamp, $type , $format , $timezone);
++    
++        if ($r!=false) {
++            return $r;
++        }
++    }
++  }
++  
+   if (!isset($timezone)) {
+     global $user;
+     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {

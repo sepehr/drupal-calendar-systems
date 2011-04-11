@@ -1,0 +1,355 @@
+<?php
+/**
+ * Implementation of hook_help().
+ */
+function calendar_systems_help($path, $arg) {
+  switch ($path) {
+    case 'admin/settings/calendar_systems':
+      $output = '<p>' . t('Using the following form you can assign a different calendar system to each language and also select the default calendar system.') .'</p>';
+      return $output;
+  }
+}
+
+
+/**
+* It loads modules required files
+*/
+function calendar_systems_load_dependenies() {
+  global $_calendar_systems_load_dependenies_called;
+  if ($_calendar_systems_load_dependenies_called!==TRUE) {
+    if (!class_exists('cmfcClassesCore') and !module_exists('cml')) {
+      require_once(dirname(__FIlE__) . '/calendar/lib/classesCore.class.inc.php');
+    }
+
+    if (!class_exists('cmfcCalendar')) {
+      require_once(dirname(__FIlE__) . '/calendar/calendar.class.inc.php');
+    }
+    
+    $_calendar_systems_load_dependenies_called=TRUE;
+  }
+}
+
+
+
+/**
+ * Implementation of hook_perm().
+ */
+function calendar_systems_perm() {
+  return array(
+    'administer calendar_systems',
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function calendar_systems_menu() {
+  $items['admin/settings/calendar_systems'] = array(
+    'title' => 'Calendar systems',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('calendar_systems_profile_overview'),
+    'description' => 'Assign calendar systems.',
+    'access arguments' => array('administer calendar_systems'),
+    'file' => 'calendar_systems.admin.inc',
+  );
+  $items['admin/settings/calendar_systems/profile'] = array(
+    'title' => 'Profiles',
+    'description' => 'Assign calendar systems.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/settings/calendar_systems/profile/%/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('calendar_systems_profile_form', 4),
+    'access arguments' => array('administer calendar_systems'),
+    'file' => 'calendar_systems.admin.inc',
+    'description' => 'Assign calendar systems.',
+    'tab_root' => 'admin/settings/calendar_systems/profile',
+    'tab_parent' => 'admin/settings/calendar_systems/profile/%',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/settings/calendar_systems/profile/%/delete'] = array(
+    'title' => 'Remove',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('calendar_systems_profile_delete_confirm', 4),
+    'access arguments' => array('administer calendar_systems'),
+    'description' => 'Assign calendar systems.',
+    'file' => 'calendar_systems.admin.inc',
+    'tab_root' => 'admin/settings/calendar_systems/profile',
+    'tab_parent' => 'admin/settings/calendar_systems/profile/%calendar_systems_profile',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+  return $items; 
+}
+
+
+/**
+ * Implementation of hook_theme().
+ *
+ * @see drupal_common_theme(), common.inc
+ * @see template_preprocess_page(), theme.inc
+ */
+function calendar_systems_theme() {
+  return array(
+    'calendar_systems_profile_overview' => array('arguments' => array('form' => NULL)),
+    'calendar_systems_admin_button_table' => array('arguments' => array('form' => NULL))
+  );
+}
+
+/**
+*  Gets list of all supported calendar systems
+*/
+function calendar_systems_get_all_plugins() {
+    $result=array(
+        'default' => array(
+            'title' => 'Drupal\'s Default',
+            'installed' => TRUE,
+            'installed version' => 2,
+        ),
+        /*
+        'gregorian' => array(
+            'title' => 'Gregorian',
+            'installed' => TRUE,
+            'installed version' => 2,
+        ),
+        */
+        'iranian' => array(
+            'title' => 'Iranian',
+            'installed' => TRUE,
+            'installed version' => 2,
+        ),
+        'arabic' => array(
+            'title' => 'Arabic',
+            'installed' => TRUE,
+            'installed version' => 2,
+        ),
+    );
+    
+    return $result;
+}
+
+/**
+*  Gets list of active langauges
+*/
+function calendar_systems_get_all_langauges() {
+    
+    if (function_exists('locale_language_list')) {
+        $langs=locale_language_list('name', TRUE);
+    } else {
+        $langs=array();
+    }
+    
+    $result['default']=array(
+        'name' => 'Default'
+    );
+    if (is_array($langs)) {
+        foreach ($langs as $name => $title) {
+            $result[$name]=array(
+                'name' => $title
+            );
+        }
+    }
+    
+    return $result;
+}
+
+/**
+*  Gets list of active profiles 
+*/
+function calendar_systems_profile_load_all() {
+    static $profiles;
+
+    if (!isset($profiles)) {
+        $profiles = array();
+        $result = db_query('SELECT language, calendar_system, settings FROM {calendar_systems}');
+        while ($profile = db_fetch_object($result)) {
+            $profile->settings = unserialize($profile->settings);
+            $profiles[$profile->language] = $profile;
+        }
+    }
+
+    return $profiles;
+}
+
+/**
+* Gets name of the currently acitve language
+*/
+function calendar_systems_get_active_lang() {
+    global $language;
+    $result='default';
+    if ($language) {
+        if ($language->language) {
+            $result=$language->language;
+        }
+    }
+    
+    return $result;
+}
+
+/**
+*  Gets an instance of the calendar object for
+*  the selected calendar system acording to the settings
+*  
+*/
+function calendar_systems_get_calendar_instance() {
+  calendar_systems_load_dependenies();
+  $profiles=calendar_systems_profile_load_all();
+  $lang=calendar_systems_get_active_lang();
+
+  if (isset($profiles[$lang])) {
+    $calendar_system=$profiles[$lang]->calendar_system;
+  } 
+  else {
+    if ($profiles['default']) {
+		$calendar_system=$profiles['default']->calendar_system;
+	}
+  }
+  if (empty($calendar_system))  {
+    $calendar_system='default';
+  }
+
+  if ($calendar_system=='iranian') {
+    $calendar=cmfcCalendar::factory('v1', array(
+      'name' => 'iranian'
+    ));
+  } 
+  elseif ($calendar_system=='arabic') {
+    $calendar=cmfcCalendar::factory('v1', array(
+      'name' => 'arabic'
+    ));
+  } 
+  elseif ($calendar_system=='default') {
+    $calendar=cmfcCalendar::factory('v1', array(
+      'name' => 'gregorian'
+    ));
+  }
+
+  return $calendar;
+}
+
+
+
+/**
+ * Implementation of hook format_date
+ *
+ * Format a date with the given configured format or a custom format string.
+ *
+ * Drupal allows administrators to select formatting strings for 'small',
+ * 'medium' and 'large' date formats. This function can handle these formats,
+ * as well as any custom format.
+ *
+ * @param $timestamp
+ *   The exact date to format, as a UNIX timestamp.
+ * @param $type
+ *   The format to use. Can be "small", "medium" or "large" for the preconfigured
+ *   date formats. If "custom" is specified, then $format is required as well.
+ * @param $format
+ *   A PHP date format string as required by date(). A backslash should be used
+ *   before a character to avoid interpreting the character as part of a date
+ *   format.
+ * @param $timezone
+ *   Time zone offset in seconds; if omitted, the user's time zone is used.
+ * @param $langcode
+ *   Optional language code to translate to a language other than what is used
+ *   to display the page.
+ * @return
+ *   A translated date string in the requested format.
+ */
+function calendar_systems_format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
+  $calendar=calendar_systems_get_calendar_instance();
+  
+  if (!isset($timezone)) {
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    }
+    else {
+      $timezone = variable_get('date_default_timezone', 0);
+    }
+  }
+
+  $timestamp += $timezone;
+
+  switch ($type) {
+    case 'small':
+      $format = variable_get('date_format_short', 'm/d/Y - H:i');
+      break;
+    case 'large':
+      $format = variable_get('date_format_long', 'l, F j, Y - H:i');
+      break;
+    case 'custom':
+      // No change to format.
+      break;
+    case 'medium':
+    default:
+      $format = variable_get('date_format_medium', 'D, m/d/Y - H:i');
+  }
+
+  $max = strlen($format);
+  $date = '';
+  for ($i = 0; $i < $max; $i++) {
+    $c = $format[$i];
+    if (strpos('AaDlM', $c) !== FALSE) {
+      $date .= t($calendar->timestampToStr($c, $timestamp), array(), $langcode);
+    }
+    elseif ($c == 'F') {
+      // Special treatment for long month names: May is both an abbreviation
+      // and a full month name in English, but other languages have
+      // different abbreviations.
+      $date .= trim(t('!long-month-name '. $calendar->timestampToStr($c, $timestamp), array('!long-month-name' => ''), $langcode));
+    }
+    elseif (strpos('BdgGhHiIjLmnsStTUwWYyz', $c) !== FALSE) {
+      $date .= $calendar->timestampToStr($c, $timestamp);
+    }
+    elseif ($c == 'r') {
+      $date .= calendar_systems_format_date($timestamp - $timezone, 'custom', 'D, d M Y H:i:s O', $timezone, $langcode);
+    }
+    elseif ($c == 'O') {
+      $date .= sprintf('%s%02d%02d', ($timezone < 0 ? '-' : '+'), abs($timezone / 3600), abs($timezone % 3600) / 60);
+    }
+    elseif ($c == 'Z') {
+      $date .= $timezone;
+    }
+    elseif ($c == '\\') {
+      $date .= $format[++$i];
+    }
+    else {
+      $date .= $c;
+    }
+  }
+
+  return $date;
+}
+
+/**
+* Validates date fields considerign the acitve calendar system
+*/
+function calendar_systems_date_validate($element, &$form_state) {
+   if (!empty($element['#value'])) {
+       // form_error($element, t('This field is required.'));
+       $v=$element['#value'];
+       $calendar=calendar_systems_get_calendar_instance();
+       $a=preg_replace('/([0-9]+\-[0-9]+\-[0-9]+) (.*)/si', '$1', $v);
+       $b=preg_replace('/([0-9]+\-[0-9]+\-[0-9]+) (.*)/si', '$2', $v);
+       $v=$calendar->strToTimestamp("$a 10:10:10");
+       $v=date("Y-m-d $b", $v);
+       form_set_value($element, $v, &$form_state);
+   }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ * Optionally record all form submissions, for later use in
+ * building distributions
+ */
+function calendar_systems_form_alter(&$form, $form_state, $form_id) {
+     
+    if (isset($form['author']['date'])) {
+        $form['author']['date']['#element_validate']=array('calendar_systems_date_validate');
+    }
+    
+    if (isset($form['admin']['date'])) {
+        $form['admin']['date']['#element_validate']=array('calendar_systems_date_validate');
+    }
+}
