@@ -116,18 +116,15 @@ function theme_calendar_systems_profile_overview($variables) {//dpm($variables['
  */
 function calendar_systems_profile_overview_submit($form, &$form_state) {
   foreach ($form_state['values']['formats'] as $format => $values) {
-    if ($values['editor'] != 'default') {
-      // Build the record array:
-      $record = array(
-        'language' => $format,
-        'calendar_system' => $values['editor'],
-      );
-      // Try to update existing profile:
-      // drupal_write_record() returns SAVED_UPDATED even if there are no records to update!
-      if (!db_update('calendar_systems')->fields($record)->condition('language', $format)->execute()) {
-        // Insert otherwise:
-        drupal_write_record('calendar_systems', $record);
-      }
+    if ($values['editor'] != 'default' && !empty($format)) {
+      // Try to update existing profile or insert otherwise:
+      $updated = db_merge('calendar_systems')
+        ->key(array('language' => $format))
+        ->fields(array(
+          'language' => $format,
+          'calendar_system' => $values['editor'],
+        ))
+        ->execute();
     }
   }
   // Notify user:
