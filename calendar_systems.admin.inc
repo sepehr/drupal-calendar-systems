@@ -530,7 +530,8 @@ function calendar_systems_profile_delete_confirm_submit($form, &$form_state) {
     ->execute();
   // Notify user:
   drupal_set_message(t('Calendar systems profile for %name has been deleted.',
-    array('%name' => $format->name)
+    array('%name' => $form_state['values']['format'])
   ));
-  //$form_state['redirect'] = 'admin/settings/calendar_systems';
+  // Redirect user to the profile overview form:
+  $form_state['redirect'] = 'admin/config/regional/calendar-systems';
 }
