@@ -496,31 +496,43 @@ function calendar_systems_profile_overview_submit($form, &$form_state) {
 }
 
 /**
- * Delete editor profile confirmation form.
+ * Form callback for profile removal confirmarion.
+ *
+ * @ingroup forms
  */
-function calendar_systems_profile_delete_confirm(&$form_state, $profile) {
+function calendar_systems_profile_delete_confirm($form, &$form_state, $profile) {
   $languages = calendar_systems_get_all_langauges();
   $language = $languages[$profile];
 
-  $form['format'] = array('#type' => 'value', '#value' => $language['name']);
+  // Build form array:
+  $form = array();
+  $form['format'] = array(
+    '#type' => 'value',
+    '#value' => $language['name']
+  );
+  // Create the confirmation
+  // form and let it be rendered:
   return confirm_form(
     $form,
     t('Are you sure you want to remove the profile for %name?', array('%name' => $language['name'])),
-    'admin/settings/calendar_systems',
+    'admin/config/regional/calendar-systems',
     t('This action cannot be undone.'), t('Remove'), t('Cancel')
   );
 }
 
 /**
- * Submit callback for Calendar systems profile delete form.
- *
- * @see calendar_systems_profile_delete_confirm()
+ * Submission callback for profile removal confirmarion form.
  */
 function calendar_systems_profile_delete_confirm_submit($form, &$form_state) {
-  $format = $form_state['values']['format'];
-  calendar_systems_profile_delete($format->format);
-  drupal_set_message(t('Calendar systems profile for %name has been deleted.', array('%name' => $format->name)));
-  $form_state['redirect'] = 'admin/settings/calendar_systems';
+  // Delete the specified profile:
+  db_delete('calendar_systems')
+    ->condition('language', $form_state['values']['format'])
+    ->execute();
+  // Notify user:
+  drupal_set_message(t('Calendar systems profile for %name has been deleted.',
+    array('%name' => $format->name)
+  ));
+  //$form_state['redirect'] = 'admin/settings/calendar_systems';
 }
 
 /**
