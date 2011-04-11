@@ -13,17 +13,17 @@ function calendar_systems_schema() {
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'calendar_system' => array(
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
-        'default' => ''
+        'default' => '',
       ),
       'settings' => array(
         'type' => 'text',
-        'size' => 'normal'
+        'size' => 'normal',
       ),
     ),
     'primary key' => array('language'),
