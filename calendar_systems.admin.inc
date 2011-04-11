@@ -471,11 +471,11 @@ function theme_calendar_systems_profile_overview($form) {
 }
 
 /**
- * Submit callback for Calendar systems profile overview form.
+ * Submission callback for calendar systems profiles form.
  */
 function calendar_systems_profile_overview_submit($form, &$form_state) {
   foreach ($form_state['values']['formats'] as $format => $values) {
-    if ($values['editor']!='default') {
+    if ($values['editor'] != 'default') {
       db_query("UPDATE {calendar_systems} SET calendar_system = '%s' WHERE language = '%s'", $values['editor'], $format);
       if (!db_affected_rows()) {
         db_query("INSERT INTO {calendar_systems} (language, calendar_system) VALUES ('%s', '%s')", $format, $values['editor']);
