@@ -68,6 +68,99 @@ function calendar_systems_theme() {
 }
 
 /**
+ * Implements hook_format_date().
+ *
+ * Format a date with the given configured format or a custom format string.
+ *
+ * Drupal allows administrators to select formatting strings for 'small',
+ * 'medium' and 'large' date formats. This function can handle these formats,
+ * as well as any custom format.
+ *
+ * @param $timestamp
+ *   The exact date to format, as a UNIX timestamp.
+ * @param $type
+ *   The format to use. Can be "small", "medium" or "large" for the preconfigured
+ *   date formats. If "custom" is specified, then $format is required as well.
+ * @param $format
+ *   A PHP date format string as required by date(). A backslash should be used
+ *   before a character to avoid interpreting the character as part of a date
+ *   format.
+ * @param $timezone
+ *   Time zone offset in seconds; if omitted, the user's time zone is used.
+ * @param $langcode
+ *   Optional language code to translate to a language other than what is used
+ *   to display the page.
+ *
+ * @return
+ *   A translated date string in the requested format.
+ */
+function calendar_systems_format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
+  $calendar = calendar_systems_get_calendar_instance();
+
+  if (!isset($timezone)) {
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    }
+    else {
+      $timezone = variable_get('date_default_timezone', 0);
+    }
+  }
+
+  $timestamp += $timezone;
+
+  switch ($type) {
+    case 'small':
+      $format = variable_get('date_format_short', 'm/d/Y - H:i');
+      break;
+    case 'large':
+      $format = variable_get('date_format_long', 'l, F j, Y - H:i');
+      break;
+    case 'custom':
+      // No change to format.
+      break;
+    case 'medium':
+    default:
+      $format = variable_get('date_format_medium', 'D, m/d/Y - H:i');
+  }
+
+  $max = strlen($format);
+  $date = '';
+  for ($i = 0; $i < $max; $i++) {
+    $c = $format[$i];
+    if (strpos('AaDlM', $c) !== FALSE) {
+      $date .= t($calendar->timestampToStr($c, $timestamp), array(), $langcode);
+    }
+    elseif ($c == 'F') {
+      // Special treatment for long month names: May is both an abbreviation
+      // and a full month name in English, but other languages have
+      // different abbreviations.
+      $date .= trim(t('!long-month-name '. $calendar->timestampToStr($c, $timestamp), array('!long-month-name' => ''), $langcode));
+    }
+    elseif (strpos('BdgGhHiIjLmnsStTUwWYyz', $c) !== FALSE) {
+      $date .= $calendar->timestampToStr($c, $timestamp);
+    }
+    elseif ($c == 'r') {
+      $date .= calendar_systems_format_date($timestamp - $timezone, 'custom', 'D, d M Y H:i:s O', $timezone, $langcode);
+    }
+    elseif ($c == 'O') {
+      $date .= sprintf('%s%02d%02d', ($timezone < 0 ? '-' : '+'), abs($timezone / 3600), abs($timezone % 3600) / 60);
+    }
+    elseif ($c == 'Z') {
+      $date .= $timezone;
+    }
+    elseif ($c == '\\') {
+      $date .= $format[++$i];
+    }
+    else {
+      $date .= $c;
+    }
+  }
+
+  return $date;
+}
+
+/**
  * Internal helper to load calendar system's required dependencies.
  */
 function _calendar_systems_load() {
@@ -216,100 +309,6 @@ function calendar_systems_get_calendar_instance() {
   }
 
   return $calendar;
-}
-
-
-
-/**
- * Implements hook format_date
- *
- * Format a date with the given configured format or a custom format string.
- *
- * Drupal allows administrators to select formatting strings for 'small',
- * 'medium' and 'large' date formats. This function can handle these formats,
- * as well as any custom format.
- *
- * @param $timestamp
- *   The exact date to format, as a UNIX timestamp.
- * @param $type
- *   The format to use. Can be "small", "medium" or "large" for the preconfigured
- *   date formats. If "custom" is specified, then $format is required as well.
- * @param $format
- *   A PHP date format string as required by date(). A backslash should be used
- *   before a character to avoid interpreting the character as part of a date
- *   format.
- * @param $timezone
- *   Time zone offset in seconds; if omitted, the user's time zone is used.
- * @param $langcode
- *   Optional language code to translate to a language other than what is used
- *   to display the page.
- * @return
- *   A translated date string in the requested format.
- */
-function calendar_systems_format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
-  $calendar=calendar_systems_get_calendar_instance();
-
-  if (!isset($timezone)) {
-    global $user;
-    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
-      $timezone = $user->timezone;
-    }
-    else {
-      $timezone = variable_get('date_default_timezone', 0);
-    }
-  }
-
-  $timestamp += $timezone;
-
-  switch ($type) {
-    case 'small':
-      $format = variable_get('date_format_short', 'm/d/Y - H:i');
-      break;
-    case 'large':
-      $format = variable_get('date_format_long', 'l, F j, Y - H:i');
-      break;
-    case 'custom':
-      // No change to format.
-      break;
-    case 'medium':
-    default:
-      $format = variable_get('date_format_medium', 'D, m/d/Y - H:i');
-  }
-
-  $max = strlen($format);
-  $date = '';
-  for ($i = 0; $i < $max; $i++) {
-    $c = $format[$i];
-    if (strpos('AaDlM', $c) !== FALSE) {
-      $date .= t($calendar->timestampToStr($c, $timestamp), array(), $langcode);
-    }
-    elseif ($c == 'F') {
-      // Special treatment for long month names: May is both an abbreviation
-      // and a full month name in English, but other languages have
-      // different abbreviations.
-      $date .= trim(t('!long-month-name '. $calendar->timestampToStr($c, $timestamp), array('!long-month-name' => ''), $langcode));
-    }
-    elseif (strpos('BdgGhHiIjLmnsStTUwWYyz', $c) !== FALSE) {
-      $date .= $calendar->timestampToStr($c, $timestamp);
-    }
-    elseif ($c == 'r') {
-      $date .= calendar_systems_format_date($timestamp - $timezone, 'custom', 'D, d M Y H:i:s O', $timezone, $langcode);
-    }
-    elseif ($c == 'O') {
-      $date .= sprintf('%s%02d%02d', ($timezone < 0 ? '-' : '+'), abs($timezone / 3600), abs($timezone % 3600) / 60);
-    }
-    elseif ($c == 'Z') {
-      $date .= $timezone;
-    }
-    elseif ($c == '\\') {
-      $date .= $format[++$i];
-    }
-    else {
-      $date .= $c;
-    }
-  }
-
-  return $date;
 }
 
 /**
