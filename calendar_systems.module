@@ -116,31 +116,6 @@ function _calendar_systems_plugins() {
 }
 
 /**
- *  Gets list of active langauges
- */
-function calendar_systems_get_all_langauges() {
-
-    if (function_exists('locale_language_list')) {
-        $langs=locale_language_list('name', TRUE);
-    } else {
-        $langs=array();
-    }
-
-    $result['default']=array(
-        'name' => 'Default'
-    );
-    if (is_array($langs)) {
-        foreach ($langs as $name => $title) {
-            $result[$name]=array(
-                'name' => $title
-            );
-        }
-    }
-
-    return $result;
-}
-
-/**
  *  Gets list of active profiles
  */
 function calendar_systems_profile_load_all() {
