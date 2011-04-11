@@ -5,12 +5,10 @@
  */
 function calendar_systems_help($path, $arg) {
   switch ($path) {
-    case 'admin/settings/calendar_systems':
-      $output = '<p>' . t('Using the following form you can assign a different calendar system to each language and also select the default calendar system.') .'</p>';
-      return $output;
+    case 'admin/config/calendar-systems':
+      return '<p>' . t('Using the following form you can assign a different calendar system to each language and also select the default calendar system.') . '</p>';
   }
 }
-
 
 /**
  * It loads modules required files
