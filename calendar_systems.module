@@ -129,7 +129,7 @@ function calendar_systems_format_date($timestamp, $type = 'medium', $format = ''
   for ($i = 0; $i < $max; $i++) {
     $c = $format[$i];
     if (strpos('AaDlM', $c) !== FALSE) {
-      $date .= t($calendar->timestampToStr($c, $timestamp), array(), $langcode);
+      $date .= $calendar->timestampToStr($c, $timestamp);
     }
     elseif ($c == 'F') {
       // Special treatment for long month names: May is both an abbreviation
