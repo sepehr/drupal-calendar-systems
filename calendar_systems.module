@@ -13,9 +13,12 @@ function calendar_systems_help($path, $arg) {
 /**
  * Implements hook_perm().
  */
-function calendar_systems_perm() {
+function calendar_systems_permission() {
   return array(
-    'administer calendar_systems',
+    'administer calendar_systems' => array(
+      'title' => t('Administer calendar systems'),
+      'description' => t('Administer calendar systems configurations.'),
+    ),
   );
 }
 
