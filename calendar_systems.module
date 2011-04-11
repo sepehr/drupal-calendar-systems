@@ -116,7 +116,7 @@ function _calendar_systems_plugins() {
 }
 
 /**
- *  Internal helper to get all active languages.
+ * Internal helper to get all active languages.
  *
  * @return
  *   An array of active languages.
@@ -141,6 +141,28 @@ function _calendar_systems_langauges() {
   }
 
   return $languages;
+}
+
+/**
+ * Internal static cache helper to get all available profiles.
+ *
+ * @return
+ *   An array of available profiles.
+ */
+function _calendar_systems_profiles() {
+  $cache = &drupal_static(__FUNCTION__);
+
+  if (!isset($cache)) {
+    $cache = array();
+    $profiles = db_query('SELECT language, calendar_system, settings FROM {calendar_systems}');
+    // Build an array of profiles keyed by the identifiers:
+    foreach ($profiles as $profile) {
+      $profile->settings = unserialize($profile->settings);
+      $cache[$profile->language] = $profile;
+    }
+  }
+
+  return $profiles;
 }
 
 /**
