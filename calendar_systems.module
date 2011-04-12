@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Contains Calendar Systems hook implementations and helpers.
+ */
+
+/**
  * Implements hook_help().
  */
 function calendar_systems_help($path, $arg) {

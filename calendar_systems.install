@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ * Contains Calendar Systems installation hooks.
+
+/**
  * Implements hook_schema().
  */
 function calendar_systems_schema() {

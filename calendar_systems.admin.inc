@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Integrate Calendar systems editors into Drupal.
+ * Contains Calendar Systems administration form callbacks.
  */
 
 /**
