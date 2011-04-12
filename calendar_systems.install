@@ -3,6 +3,7 @@
 /**
  * @file
  * Contains Calendar Systems installation hooks.
+ */
 
 /**
  * Implements hook_schema().
