@@ -5,11 +5,10 @@ Support for various calendars like Jalali, Gregorian, Hijir, Hebew, etc.
 INSTALLATION
 ============
   - Install and enable the module as usual: http://drupal.org/node/70151
-  - Add the following code right after "function format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {"
-     in "/includes/common.inc" or apply the patch located in patches/ in module's directory. if you don't know how to apply patches,
-     there is a good guide here: http://drupal.org/patch/apply
+  - Add the following code right after "$timezones = &$drupal_static_fast['timezones'];" in "/includes/common.inc" file
+    or apply the patch located in patches/ in module's directory. if you don't know how to apply patches, there is a good guide here:
+    http://drupal.org/patch/apply
 
-          // Custom hook
           foreach (module_implements('format_date') AS $module) {
             if ($module!='date') {
                 $function = $module .'_format_date';
@@ -25,7 +24,7 @@ INSTALLATION
 
 SUPPORT
 =======
-Found a bug? report here: http://drupal.org/node/add/project-issue/calendar_systems
+Hunted a bug? report here: http://drupal.org/node/add/project-issue/calendar_systems
 
 AUTHORS AND MAINTAINERS
 =======================
